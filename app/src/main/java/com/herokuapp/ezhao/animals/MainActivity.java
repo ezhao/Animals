@@ -1,16 +1,49 @@
 package com.herokuapp.ezhao.animals;
 
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import org.apache.http.Header;
+import org.json.JSONException;
+import org.json.JSONObject;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import pl.droidsonroids.gif.GifImageView;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends FragmentActivity {
+    @InjectView(R.id.givGiphy) GifImageView givGiphy;
+    GiphyClient giphyClient;
+    final String CUTE_ANIMAL = "cute animals";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ButterKnife.inject(this);
+
+        giphyClient = new GiphyClient();
+        giphyClient.getRandom(CUTE_ANIMAL, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    JSONObject data = response.getJSONObject("data");
+                    String imageUrl = data.getString("image_url");
+                    setImage(imageUrl);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+    }
+
+    private void setImage(String url) {
+        Log.i("EMILY", url);
+        new GifDownloadTask(givGiphy).execute(url);
     }
 
     @Override
