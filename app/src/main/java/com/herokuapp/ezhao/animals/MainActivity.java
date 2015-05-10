@@ -2,19 +2,21 @@ package com.herokuapp.ezhao.animals;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 import pl.droidsonroids.gif.GifImageView;
 
 public class MainActivity extends FragmentActivity {
     @InjectView(R.id.givGiphy) GifImageView givGiphy;
+    @InjectView(R.id.pbLoading) ProgressBar pbLoading;
     GiphyClient giphyClient;
     final String CUTE_ANIMAL = "cute animals";
 
@@ -24,8 +26,17 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         ButterKnife.inject(this);
-
         giphyClient = new GiphyClient();
+        nextImage();
+    }
+
+    private void setImage(String url) {
+        new GifDownloadTask(givGiphy, pbLoading).execute(url);
+    }
+
+    @OnClick(R.id.givGiphy)
+    public void nextImage() {
+        pbLoading.setVisibility(ProgressBar.VISIBLE);
         giphyClient.getRandom(CUTE_ANIMAL, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -36,14 +47,8 @@ public class MainActivity extends FragmentActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
-    }
-
-    private void setImage(String url) {
-        Log.i("EMILY", url);
-        new GifDownloadTask(givGiphy).execute(url);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.herokuapp.ezhao.animals;
 
 import android.os.AsyncTask;
+import android.widget.ProgressBar;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,9 +12,11 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class GifDownloadTask extends AsyncTask<String, Void, GifDrawable> {
     GifImageView gifImageView;
+    ProgressBar progressBar;
 
-    public GifDownloadTask(GifImageView gifImageView) {
+    public GifDownloadTask(GifImageView gifImageView, ProgressBar progressBar) {
         this.gifImageView = gifImageView;
+        this.progressBar = progressBar;
     }
 
     protected GifDrawable doInBackground(String... addresses) {
@@ -43,5 +46,6 @@ public class GifDownloadTask extends AsyncTask<String, Void, GifDrawable> {
     protected void onPostExecute(GifDrawable result) {
         // Set bitmap image for the result
         gifImageView.setImageDrawable(result);
+        progressBar.setVisibility(ProgressBar.INVISIBLE);
     }
 }
